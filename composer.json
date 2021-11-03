@@ -1,0 +1,19 @@
+{
+    "name": "fzed51/version",
+    "description": "Class permet de manipuler des numeros de version",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Version\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Fabien Sanchez",
+            "email": "fzed51+git@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}

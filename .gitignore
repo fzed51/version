@@ -1,0 +1,17 @@
+#
+# OS
+#
+
+#
+# IDE
+#
+/.idea/
+
+#
+# COMPOSER
+#
+/vendor/
+
+#
+# PROJET
+#
