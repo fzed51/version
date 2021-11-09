@@ -6,7 +6,7 @@ namespace Version;
 use JsonSerializable;
 
 /**
- * class pour les version respectant SemVer 2.0
+ * class pour les versions respectant SemVer 2.0
  */
 class SemVer implements JsonSerializable
 {
