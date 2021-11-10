@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Version;
 
 use JsonSerializable;
+use RuntimeException;
 
 /**
  * class pour les versions respectant SemVer 2.0
@@ -86,5 +87,32 @@ class SemVer implements JsonSerializable
     public function realease(): ?string
     {
         return $this->realease;
+    }
+
+    /**
+     * update le patch
+     */
+    public function nextPatch(): void
+    {
+        $this->patch++;
+    }
+
+    /**
+     * update la version mineure
+     */
+    public function nextMinor(): void
+    {
+        $this->patch = 0;
+        $this->minor++;
+    }
+
+    /**
+     * update la version majeure
+     */
+    public function nextMajor(): void
+    {
+        $this->patch = 0;
+        $this->minor = 0;
+        $this->major++;
     }
 }
