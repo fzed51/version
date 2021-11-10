@@ -27,9 +27,9 @@ echo $version; // v2.0.0
 ```php
 $version = new \Version\SemVer(1,0,0,'dev');
 echo $version; // v1.0.0-dev
-$version->setTag('rc1')
+$version->setRelease('rc1')
 echo $version; // v1.0.0-rc1
-$version->clearTag();
+$version->setRelease();
 echo $version; // v1.0.0
 ```
 ```php

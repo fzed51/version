@@ -115,4 +115,26 @@ class SemVer implements JsonSerializable
         $this->minor = 0;
         $this->major++;
     }
+
+    /**
+     * setter pour la version
+     * @param int|null $major
+     * @param int|null $minor
+     * @param int|null $patch
+     */
+    public function set(?int $major, ?int $minor, ?int $patch): void
+    {
+        $this->patch = $patch ?? $this->patch;
+        $this->minor = $minor ?? $this->minor;
+        $this->major = $major ?? $this->major;
+    }
+
+    /**
+     * setter pour la release
+     * @param string|null $release
+     */
+    public function setRelease(?string $release = null): void
+    {
+        $this->realease = $release;
+    }
 }
