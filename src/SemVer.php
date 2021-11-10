@@ -137,4 +137,24 @@ class SemVer implements JsonSerializable
     {
         $this->realease = $release;
     }
+
+    /**
+     * création d'une SemVer à partir d'une chaine de caractère
+     * @param string $version
+     * @return \Version\SemVer
+     */
+    public static function fromString(string $version): self
+    {
+        if(preg_match("/v?(?'maj'\d+)(?:\.(?'min'\d+)(?:\.(?'pat'\d+))?)?(-(?'rea'\w+))?/", $version, $matches) === 1){
+            $major = (int)$matches['maj'];
+            $minor = (int)($matches['min']??0);
+            $patch = (int)($matches['pat']??0);
+            $release = null;
+            if(($matches['rea'] ?? null) !== null && $matches['rea'] !== ''){
+                $release = $matches['rea'];
+            }
+            return new self($major, $minor, $patch, $release);
+        }
+        throw new RuntimeException("$version n'est pas une version valide");
+    }
 }

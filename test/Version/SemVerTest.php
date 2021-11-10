@@ -39,4 +39,10 @@ class SemVerTest extends TestCase
         $version->setRelease();
         self::assertEquals('v1.4.0', (string)$version);
     }
+
+    public function testCreateFromString(): void
+    {
+        $version = \Version\SemVer::fromString('v2.4');
+        self::assertEquals('v2.4.0', (string)$version);
+    }
 }
