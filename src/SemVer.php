@@ -14,20 +14,20 @@ class SemVer implements JsonSerializable
     private int $major;
     private int $minor;
     private int $patch;
-    private ?string $realease;
+    private ?string $preRelease;
 
     /**
      * @param int $major
      * @param int $minor
      * @param int $patch
-     * @param string|null $realease
+     * @param string|null $preRelease
      */
-    public function __construct(int $major, int $minor, int $patch, ?string $realease = null)
+    public function __construct(int $major, int $minor, int $patch, ?string $preRelease = null)
     {
         $this->major = $major;
         $this->minor = $minor;
         $this->patch = $patch;
-        $this->realease = $realease;
+        $this->preRelease = $preRelease;
     }
 
     /**
@@ -37,8 +37,8 @@ class SemVer implements JsonSerializable
     public function __toString()
     {
         $version = sprintf('v%d.%d.%d', $this->major, $this->minor, $this->patch);
-        if ($this->realease !== null) {
-            $version .= "-{$this->realease}";
+        if ($this->preRelease !== null) {
+            $version .= "-{$this->preRelease}";
         }
         return $version;
     }
@@ -53,7 +53,7 @@ class SemVer implements JsonSerializable
             'major' => $this->major,
             'minor' => $this->minor,
             'patch' => $this->patch,
-            'release' => $this->realease
+            'pre-release' => $this->preRelease
         ];
     }
 
@@ -84,9 +84,9 @@ class SemVer implements JsonSerializable
     /**
      * @return string|null
      */
-    public function realease(): ?string
+    public function PreRelease(): ?string
     {
-        return $this->realease;
+        return $this->preRelease;
     }
 
     /**
@@ -131,11 +131,11 @@ class SemVer implements JsonSerializable
 
     /**
      * setter pour la release
-     * @param string|null $release
+     * @param string|null $preRelease
      */
-    public function setRelease(?string $release = null): void
+    public function setPreRelease(?string $preRelease = null): void
     {
-        $this->realease = $release;
+        $this->preRelease = $preRelease;
     }
 
     /**
@@ -145,15 +145,15 @@ class SemVer implements JsonSerializable
      */
     public static function fromString(string $version): self
     {
-        if(preg_match("/v?(?'maj'\d+)(?:\.(?'min'\d+)(?:\.(?'pat'\d+))?)?(-(?'rea'\w+))?/", $version, $matches) === 1){
+        if(preg_match("/v?(?'maj'\d+)\.(?'min'\d+)\.(?'pat'\d+)(-(?'pre'\w+))?(\+(?'met'\w+))?/", $version, $matches) === 1){
             $major = (int)$matches['maj'];
             $minor = (int)($matches['min']??0);
             $patch = (int)($matches['pat']??0);
-            $release = null;
-            if(($matches['rea'] ?? null) !== null && $matches['rea'] !== ''){
-                $release = $matches['rea'];
+            $preRelease = null;
+            if(($matches['pre'] ?? null) !== null && $matches['pre'] !== ''){
+                $preRelease = $matches['pre'];
             }
-            return new self($major, $minor, $patch, $release);
+            return new self($major, $minor, $patch, $preRelease);
         }
         throw new RuntimeException("$version n'est pas une version valide");
     }
