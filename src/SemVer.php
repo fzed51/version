@@ -192,9 +192,98 @@ class SemVer implements JsonSerializable
         $this->metaBuild = $metaBuild;
     }
 
-            }
-            return new self($major, $minor, $patch, $preRelease);
+    private function comparePreRelease(?string $pre1 = '', ?string $pre2 = ''): int {
+        if($pre1 === $pre2){
+            return 0;
         }
-        throw new RuntimeException("$version n'est pas une version valide");
+        $pre1Elements = explode('.', $pre1 ?? '');
+        $pre2Elements = explode('.', $pre2 ?? '');
+        foreach ($pre1Elements as $idx => $pre1Element){
+            $pre2Element = $pre2Elements[$idx] ?? '';
+            if($pre1Element !== $pre2Element && $pre1Element === ''){
+                return 1;
+            }
+            if($pre1Element !== $pre2Element && $pre2Element === ''){
+                return -1;
+            }
+            if($pre1Element > $pre2Element){
+                return 1;
+            }
+            if($pre1Element > $pre2Element){
+                return -1;
+            }
+        }
+        if(count($pre1Elements) < count($pre2Elements)){
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function gt(SemVer $version): bool{
+        return (
+            $this->major > $version->major
+            || ($this->major === $version->major
+                && $this->minor > $version->minor)
+            || ($this->major === $version->major
+                && $this->minor === $version->minor
+                && $this->patch > $version->patch)
+            || ($this->major === $version->major
+                && $this->minor === $version->minor
+                && $this->patch === $version->patch
+                && $this->comparePreRelease($this->preRelease , $version->preRelease) > 0)
+        );
+    }
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function ge(SemVer $version): bool{
+        return !$this->lt($version);
+    }
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function eq(SemVer $version): bool{
+        return (
+            $this->major === $version->major
+            && $this->minor === $version->minor
+            && $this->patch === $version->patch
+            && $this->comparePreRelease($this->preRelease , $version->preRelease) === 0
+        );
+    }
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function ne(SemVer $version): bool{
+        return !$this->eq($version);
+    }
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function le(SemVer $version): bool{
+        return !$this->gt($version);
+    }
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function lt(SemVer $version): bool{
+        return $this->major < $version->major
+        || ($this->major === $version->major
+            && $this->minor < $version->minor)
+        || ($this->major === $version->major
+            && $this->minor === $version->minor
+            && $this->patch < $version->patch)
+        || ($this->major === $version->major
+            && $this->minor === $version->minor
+            && $this->patch === $version->patch
+            && $this->comparePreRelease($this->preRelease , $version->preRelease) < 0);
     }
 }

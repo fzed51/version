@@ -56,4 +56,29 @@ class SemVerTest extends TestCase
         $version = SemVer::fromString('v2.4.0-alpha+20211011-0821');
         self::assertEquals('v2.4.0-alpha+20211011-0821', (string)$version);
     }
+
+    public function testCompare(): void
+    {
+        $version1 = new SemVer(1,1,0);
+        $version2 = new SemVer(11,0,0);
+        self::assertTrue($version2->gt($version1), "$version2 > $version1");
+        self::assertTrue($version2->ge($version1), "$version2 >= $version1");
+        self::assertFalse($version2->eq($version1), "not $version2 = $version1");
+        self::assertFalse($version2->le($version1), "not $version2 <= $version1");
+        self::assertFalse($version2->lt($version1), "not $version2 < $version1");
+        self::assertTrue($version2->ne($version1), "$version2 != $version1");
+        self::assertFalse($version1->gt($version2), "not $version1 > $version1");
+        self::assertFalse($version1->ge($version2), "not $version1 > $version1");
+        self::assertFalse($version1->eq($version2), "not $version1 > $version1");
+        self::assertTrue($version1->le($version2), "$version1 <= $version2");
+        self::assertTrue($version1->lt($version2), "$version1 < $version2");
+        self::assertTrue($version1->ne($version2), "$version1 != $version2");
+        self::assertFalse($version1->ne($version1), "not $version1 != $version1");
+        self::assertTrue($version1->ge($version1), "$version1 >= $version1");
+        self::assertTrue($version1->le($version1), "$version1 <= $version1");
+        $version3 = new SemVer(1,1,0,'rc1');
+        self::assertTrue($version1->gt($version3), "$version1 > $version3");
+        $version4 = new SemVer(1,1,0,'rc2');
+        self::assertTrue($version4->gt($version3), "$version2 > $version4");
+    }
 }
