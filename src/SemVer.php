@@ -15,19 +15,47 @@ class SemVer implements JsonSerializable
     private int $minor;
     private int $patch;
     private ?string $preRelease;
+    private ?string $metaBuild;
 
     /**
      * @param int $major
      * @param int $minor
      * @param int $patch
      * @param string|null $preRelease
+     * @param string|null $metaBuild
      */
-    public function __construct(int $major, int $minor, int $patch, ?string $preRelease = null)
-    {
+    public function __construct(int     $major, int $minor, int $patch, ?string $preRelease = null,
+                                ?string $metaBuild = null
+    ) {
         $this->major = $major;
         $this->minor = $minor;
         $this->patch = $patch;
         $this->preRelease = $preRelease;
+        $this->metaBuild = $metaBuild;
+    }
+
+    /**
+     * création d'une SemVer à partir d'une chaine de caractère
+     * @param string $version
+     * @return \Version\SemVer
+     */
+    public static function fromString(string $version): self
+    {
+        if (preg_match("/v?(?'maj'\d+)\.(?'min'\d+)\.(?'pat'\d+)(-(?'pre'[\w\-\.]+))?(\+(?'met'[\w\-]+))?/", $version, $matches) === 1) {
+            $major = (int)$matches['maj'];
+            $minor = (int)($matches['min'] ?? 0);
+            $patch = (int)($matches['pat'] ?? 0);
+            $preRelease = null;
+            if (($matches['pre'] ?? null) !== null && $matches['pre'] !== '') {
+                $preRelease = $matches['pre'];
+            }
+            $metaBuild = null;
+            if (($matches['met'] ?? null) !== null && $matches['met'] !== '') {
+                $metaBuild = $matches['met'];
+            }
+            return new self($major, $minor, $patch, $preRelease, $metaBuild);
+        }
+        throw new RuntimeException("$version n'est pas une version valide");
     }
 
     /**
@@ -40,6 +68,9 @@ class SemVer implements JsonSerializable
         if ($this->preRelease !== null) {
             $version .= "-{$this->preRelease}";
         }
+        if ($this->metaBuild !== null) {
+            $version .= "+{$this->metaBuild}";
+        }
         return $version;
     }
 
@@ -49,12 +80,18 @@ class SemVer implements JsonSerializable
      */
     public function jsonSerialize()
     {
-        return [
+        $version = [
             'major' => $this->major,
             'minor' => $this->minor,
             'patch' => $this->patch,
-            'pre-release' => $this->preRelease
         ];
+        if (null !== $this->preRelease) {
+            $version['pre-release'] = $this->preRelease;
+        }
+        if (null !== $this->metaBuild) {
+            $version['meta-build'] = $this->metaBuild;
+        }
+        return $version;
     }
 
     /**
@@ -87,6 +124,14 @@ class SemVer implements JsonSerializable
     public function PreRelease(): ?string
     {
         return $this->preRelease;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function metaBuild(): ?string
+    {
+        return $this->metaBuild;
     }
 
     /**
@@ -130,7 +175,7 @@ class SemVer implements JsonSerializable
     }
 
     /**
-     * setter pour la release
+     * setter pour la pre-release
      * @param string|null $preRelease
      */
     public function setPreRelease(?string $preRelease = null): void
@@ -139,19 +184,14 @@ class SemVer implements JsonSerializable
     }
 
     /**
-     * création d'une SemVer à partir d'une chaine de caractère
-     * @param string $version
-     * @return \Version\SemVer
+     * setter pour les meta de build
+     * @param string|null $metaBuild
      */
-    public static function fromString(string $version): self
+    public function setMetaBuild(?string $metaBuild = null): void
     {
-        if(preg_match("/v?(?'maj'\d+)\.(?'min'\d+)\.(?'pat'\d+)(-(?'pre'\w+))?(\+(?'met'\w+))?/", $version, $matches) === 1){
-            $major = (int)$matches['maj'];
-            $minor = (int)($matches['min']??0);
-            $patch = (int)($matches['pat']??0);
-            $preRelease = null;
-            if(($matches['pre'] ?? null) !== null && $matches['pre'] !== ''){
-                $preRelease = $matches['pre'];
+        $this->metaBuild = $metaBuild;
+    }
+
             }
             return new self($major, $minor, $patch, $preRelease);
         }

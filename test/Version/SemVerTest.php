@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Version;
 
 use Test\TestCase;
+use function PHPUnit\Framework\assertTrue;
 
 /**
  * test de SemVerTest
@@ -34,15 +35,25 @@ class SemVerTest extends TestCase
         self::assertEquals('v1.0.0-dev', (string)$version);
         $version->set(null, 4, null);
         self::assertEquals('v1.4.0-dev', (string)$version);
-        $version->setRelease('rc1');
+        $version->setPreRelease('rc1');
         self::assertEquals('v1.4.0-rc1', (string)$version);
-        $version->setRelease();
+        $version->setPreRelease();
+        self::assertEquals('v1.4.0', (string)$version);
+        $version->setMetaBuild('DQptZXJjcmVkaSAxMCB');
+        self::assertEquals('v1.4.0+DQptZXJjcmVkaSAxMCB', (string)$version);
+        $version->setMetaBuild();
         self::assertEquals('v1.4.0', (string)$version);
     }
 
     public function testCreateFromString(): void
     {
-        $version = \Version\SemVer::fromString('v2.4');
+        $version = SemVer::fromString('v2.4.0');
         self::assertEquals('v2.4.0', (string)$version);
+        $version = SemVer::fromString('2.4.0');
+        self::assertEquals('v2.4.0', (string)$version);
+        $version = SemVer::fromString('v2.4.0-alpha');
+        self::assertEquals('v2.4.0-alpha', (string)$version);
+        $version = SemVer::fromString('v2.4.0-alpha+20211011-0821');
+        self::assertEquals('v2.4.0-alpha+20211011-0821', (string)$version);
     }
 }
