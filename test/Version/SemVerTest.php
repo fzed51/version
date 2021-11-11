@@ -59,8 +59,8 @@ class SemVerTest extends TestCase
 
     public function testCompare(): void
     {
-        $version1 = new SemVer(1,1,0);
-        $version2 = new SemVer(11,0,0);
+        $version1 = new SemVer(1, 1, 0);
+        $version2 = new SemVer(11, 0, 0);
         self::assertTrue($version2->gt($version1), "$version2 > $version1");
         self::assertTrue($version2->ge($version1), "$version2 >= $version1");
         self::assertFalse($version2->eq($version1), "not $version2 = $version1");
@@ -76,9 +76,21 @@ class SemVerTest extends TestCase
         self::assertFalse($version1->ne($version1), "not $version1 != $version1");
         self::assertTrue($version1->ge($version1), "$version1 >= $version1");
         self::assertTrue($version1->le($version1), "$version1 <= $version1");
-        $version3 = new SemVer(1,1,0,'rc1');
+        $version3 = new SemVer(1, 1, 0, 'rc1');
         self::assertTrue($version1->gt($version3), "$version1 > $version3");
-        $version4 = new SemVer(1,1,0,'rc2');
+        $version4 = new SemVer(1, 1, 0, 'rc2');
         self::assertTrue($version4->gt($version3), "$version2 > $version4");
+    }
+
+    public function testJson(): void
+    {
+        $version = new SemVer(1, 0, 0, 'rc1', '01012001');
+        /** @noinspection JsonEncodingApiUsageInspection */
+        $json = json_encode($version);
+        self::assertEquals(JSON_ERROR_NONE, json_last_error());
+        self::assertNotFalse($json);
+        $version2 = SemVer::fromJson($json);
+        self::assertEquals('v1.0.0-rc1+01012001', (string)$version2);
+        var_dump($json);
     }
 }

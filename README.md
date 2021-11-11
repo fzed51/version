@@ -51,5 +51,8 @@ var_dump($version2->le($version1)); // false
 var_dump($version2->lt($version1)); // false
 var_dump($version2->ne($version1)); // true
 ```
-
-Implémente l'interface JsonSerializable. Dans une future version, _Version_ implémentera l'interface Stringable.
+```php
+$version = new \Version\SemVer(1,1,0,'rc1','12242010');
+$json = json_encode($version) ;
+echo $json; // {"major":1,"minor":0,"patch":0,"preRelease":"rc1","metaBuild":"12242010"}
+```

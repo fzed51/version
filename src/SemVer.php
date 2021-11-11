@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Version;
 
+use JsonException;
 use JsonSerializable;
 use RuntimeException;
 
@@ -24,8 +25,12 @@ class SemVer implements JsonSerializable
      * @param string|null $preRelease
      * @param string|null $metaBuild
      */
-    public function __construct(int     $major, int $minor, int $patch, ?string $preRelease = null,
-                                ?string $metaBuild = null
+    public function __construct(
+        int     $major,
+        int $minor,
+        int $patch,
+        ?string $preRelease = null,
+        ?string $metaBuild = null
     ) {
         $this->major = $major;
         $this->minor = $minor;
@@ -41,21 +46,49 @@ class SemVer implements JsonSerializable
      */
     public static function fromString(string $version): self
     {
-        if (preg_match("/v?(?'maj'\d+)\.(?'min'\d+)\.(?'pat'\d+)(-(?'pre'[\w\-\.]+))?(\+(?'met'[\w\-]+))?/", $version, $matches) === 1) {
-            $major = (int)$matches['maj'];
-            $minor = (int)($matches['min'] ?? 0);
-            $patch = (int)($matches['pat'] ?? 0);
-            $preRelease = null;
-            if (($matches['pre'] ?? null) !== null && $matches['pre'] !== '') {
-                $preRelease = $matches['pre'];
-            }
-            $metaBuild = null;
-            if (($matches['met'] ?? null) !== null && $matches['met'] !== '') {
-                $metaBuild = $matches['met'];
-            }
-            return new self($major, $minor, $patch, $preRelease, $metaBuild);
+        if (preg_match("/v?(?'major'\d+)\.(?'minor'\d+)\.(?'patch'\d+)(-(?'preRelease'[\w\-.]+))?(\+(?'metaBuild'[\w\-]+))?/i", $version, $matches) === 1) {
+            return self::fromStructure($matches);
         }
         throw new RuntimeException("$version n'est pas une version valide");
+    }
+
+    /**
+     * @param string $json
+     * @return \Version\SemVer
+     */
+    public static function fromJson(string $json): SemVer
+    {
+        try {
+            $structure = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $je) {
+            throw new RuntimeException("JSON non valide", $je->getCode(), $je);
+        }
+        return self::fromStructure($structure);
+    }
+
+    /**
+     * @param array<string,mixed>|object $structure
+     * @return \Version\SemVer
+     */
+    public static function fromStructure($structure): SemVer
+    {
+        $structure = (array)$structure;
+        if ((!isset($structure['major'], $structure['minor'], $structure['patch']))
+            || (!is_numeric($structure['major']))
+            || (!is_numeric($structure['minor']))
+            || (!is_numeric($structure['patch']))
+            || (isset($structure['preRelease']) && !is_string($structure['preRelease']))
+            || (isset($structure['metaBuild']) && !is_string($structure['metaBuild']))
+        ) {
+            throw new RuntimeException("la structure de la version n'est pas valide");
+        }
+        return new SemVer(
+            (int)$structure['major'],
+            (int)$structure['minor'],
+            (int)$structure['patch'],
+            $structure['preRelease'] ?? null,
+            $structure['metaBuild'] ?? null
+        );
     }
 
     /**
@@ -66,10 +99,10 @@ class SemVer implements JsonSerializable
     {
         $version = sprintf('v%d.%d.%d', $this->major, $this->minor, $this->patch);
         if ($this->preRelease !== null) {
-            $version .= "-{$this->preRelease}";
+            $version .= "-$this->preRelease";
         }
         if ($this->metaBuild !== null) {
-            $version .= "+{$this->metaBuild}";
+            $version .= "+$this->metaBuild";
         }
         return $version;
     }
@@ -77,6 +110,7 @@ class SemVer implements JsonSerializable
     /**
      * sérialisation en json
      * @return array<string,mixed>
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function jsonSerialize()
     {
@@ -86,10 +120,10 @@ class SemVer implements JsonSerializable
             'patch' => $this->patch,
         ];
         if (null !== $this->preRelease) {
-            $version['pre-release'] = $this->preRelease;
+            $version['preRelease'] = $this->preRelease;
         }
         if (null !== $this->metaBuild) {
-            $version['meta-build'] = $this->metaBuild;
+            $version['metaBuild'] = $this->metaBuild;
         }
         return $version;
     }
@@ -121,7 +155,7 @@ class SemVer implements JsonSerializable
     /**
      * @return string|null
      */
-    public function PreRelease(): ?string
+    public function preRelease(): ?string
     {
         return $this->preRelease;
     }
@@ -192,28 +226,62 @@ class SemVer implements JsonSerializable
         $this->metaBuild = $metaBuild;
     }
 
-    private function comparePreRelease(?string $pre1 = '', ?string $pre2 = ''): int {
-        if($pre1 === $pre2){
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function ge(SemVer $version): bool
+    {
+        return !$this->lt($version);
+    }
+
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function lt(SemVer $version): bool
+    {
+        return $this->major < $version->major
+            || ($this->major === $version->major
+                && $this->minor < $version->minor)
+            || ($this->major === $version->major
+                && $this->minor === $version->minor
+                && $this->patch < $version->patch)
+            || ($this->major === $version->major
+                && $this->minor === $version->minor
+                && $this->patch === $version->patch
+                && self::comparePreRelease($this->preRelease, $version->preRelease) < 0);
+    }
+
+    /**
+     * compare 2 prerelease
+     * @param string|null $pre1
+     * @param string|null $pre2
+     * @return int -1, 0 ou 1
+     */
+    private static function comparePreRelease(?string $pre1 = '', ?string $pre2 = ''): int
+    {
+        if ($pre1 === $pre2) {
             return 0;
         }
         $pre1Elements = explode('.', $pre1 ?? '');
         $pre2Elements = explode('.', $pre2 ?? '');
-        foreach ($pre1Elements as $idx => $pre1Element){
+        foreach ($pre1Elements as $idx => $pre1Element) {
             $pre2Element = $pre2Elements[$idx] ?? '';
-            if($pre1Element !== $pre2Element && $pre1Element === ''){
+            if ($pre1Element !== $pre2Element && $pre1Element === '') {
                 return 1;
             }
-            if($pre1Element !== $pre2Element && $pre2Element === ''){
+            if ($pre1Element !== $pre2Element && $pre2Element === '') {
                 return -1;
             }
-            if($pre1Element > $pre2Element){
+            if ($pre1Element > $pre2Element) {
                 return 1;
             }
-            if($pre1Element > $pre2Element){
+            if ($pre1Element < $pre2Element) {
                 return -1;
             }
         }
-        if(count($pre1Elements) < count($pre2Elements)){
+        if (count($pre1Elements) < count($pre2Elements)) {
             return 1;
         }
         return 0;
@@ -223,7 +291,40 @@ class SemVer implements JsonSerializable
      * @param \Version\SemVer $version
      * @return bool
      */
-    public function gt(SemVer $version): bool{
+    public function ne(SemVer $version): bool
+    {
+        return !$this->eq($version);
+    }
+
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function eq(SemVer $version): bool
+    {
+        return (
+            $this->major === $version->major
+            && $this->minor === $version->minor
+            && $this->patch === $version->patch
+            && self::comparePreRelease($this->preRelease, $version->preRelease) === 0
+        );
+    }
+
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function le(SemVer $version): bool
+    {
+        return !$this->gt($version);
+    }
+
+    /**
+     * @param \Version\SemVer $version
+     * @return bool
+     */
+    public function gt(SemVer $version): bool
+    {
         return (
             $this->major > $version->major
             || ($this->major === $version->major
@@ -234,56 +335,7 @@ class SemVer implements JsonSerializable
             || ($this->major === $version->major
                 && $this->minor === $version->minor
                 && $this->patch === $version->patch
-                && $this->comparePreRelease($this->preRelease , $version->preRelease) > 0)
+                && self::comparePreRelease($this->preRelease, $version->preRelease) > 0)
         );
-    }
-    /**
-     * @param \Version\SemVer $version
-     * @return bool
-     */
-    public function ge(SemVer $version): bool{
-        return !$this->lt($version);
-    }
-    /**
-     * @param \Version\SemVer $version
-     * @return bool
-     */
-    public function eq(SemVer $version): bool{
-        return (
-            $this->major === $version->major
-            && $this->minor === $version->minor
-            && $this->patch === $version->patch
-            && $this->comparePreRelease($this->preRelease , $version->preRelease) === 0
-        );
-    }
-    /**
-     * @param \Version\SemVer $version
-     * @return bool
-     */
-    public function ne(SemVer $version): bool{
-        return !$this->eq($version);
-    }
-    /**
-     * @param \Version\SemVer $version
-     * @return bool
-     */
-    public function le(SemVer $version): bool{
-        return !$this->gt($version);
-    }
-    /**
-     * @param \Version\SemVer $version
-     * @return bool
-     */
-    public function lt(SemVer $version): bool{
-        return $this->major < $version->major
-        || ($this->major === $version->major
-            && $this->minor < $version->minor)
-        || ($this->major === $version->major
-            && $this->minor === $version->minor
-            && $this->patch < $version->patch)
-        || ($this->major === $version->major
-            && $this->minor === $version->minor
-            && $this->patch === $version->patch
-            && $this->comparePreRelease($this->preRelease , $version->preRelease) < 0);
     }
 }
