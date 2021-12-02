@@ -91,6 +91,5 @@ class SemVerTest extends TestCase
         self::assertNotFalse($json);
         $version2 = SemVer::fromJson($json);
         self::assertEquals('v1.0.0-rc1+01012001', (string)$version2);
-        var_dump($json);
     }
 }
