@@ -82,6 +82,26 @@ class SemVerTest extends TestCase
         self::assertTrue($version4->gt($version3), "$version2 > $version4");
     }
 
+    public function testCompareWithPreRelease(): void
+    {
+        $version1 = new SemVer(1, 0, 0);
+        $version2 = new SemVer(1, 0, 0, 'alpha');
+        $version3 = new SemVer(1, 0, 0, 'RC');
+        $version4 = new SemVer(1, 0, 0, 'RC.1');
+        $version5 = new SemVer(1, 0, 0, 'RC.2');
+        self::assertTrue($version1->gt($version2), "$version1 > $version2");
+        self::assertTrue($version1->gt($version3), "$version1 > $version3");
+        self::assertTrue($version1->gt($version4), "$version1 > $version4");
+        self::assertTrue($version1->gt($version5), "$version1 > $version5");
+        self::assertTrue($version2->lt($version3), "$version2 < $version3");
+        self::assertTrue($version2->lt($version4), "$version2 < $version4");
+        self::assertTrue($version2->lt($version5), "$version2 < $version5");
+        self::assertTrue($version3->gt($version4), "$version2 > $version4");
+        self::assertTrue($version3->gt($version5), "$version2 > $version5");
+        self::assertTrue($version4->lt($version5), "$version4 < $version5");
+
+    }
+
     public function testJson(): void
     {
         $version = new SemVer(1, 0, 0, 'rc1', '01012001');

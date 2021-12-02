@@ -264,8 +264,8 @@ class SemVer implements JsonSerializable
         if ($pre1 === $pre2) {
             return 0;
         }
-        $pre1Elements = explode('.', $pre1 ?? '');
-        $pre2Elements = explode('.', $pre2 ?? '');
+        $pre1Elements = explode('.', strtoupper($pre1 ?? ''));
+        $pre2Elements = explode('.', strtoupper($pre2 ?? ''));
         foreach ($pre1Elements as $idx => $pre1Element) {
             $pre2Element = $pre2Elements[$idx] ?? '';
             if ($pre1Element !== $pre2Element && $pre1Element === '') {
