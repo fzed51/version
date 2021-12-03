@@ -4,8 +4,55 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1da98214070adc3b8400867ead012a3d",
-    "packages": [],
+    "content-hash": "37aab7c323d93ac5b14f195caed596f7",
+    "packages": [
+        {
+            "name": "fzed51/console-options",
+            "version": "v1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fzed51/console-options.git",
+                "reference": "f0f64aed974239ebaebd986cbbb26ca767605480"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fzed51/console-options/zipball/f0f64aed974239ebaebd986cbbb26ca767605480",
+                "reference": "f0f64aed974239ebaebd986cbbb26ca767605480",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "ocramius/package-versions": "^2.1",
+                "phpstan/phpstan": "^0.12.56",
+                "phpunit/phpunit": "^9.4",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Console\\Options\\": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Sanchez",
+                    "email": "fzed51@users.noreply.github.com"
+                }
+            ],
+            "description": "option parser pour ligne de commande PHP",
+            "support": {
+                "issues": "https://github.com/fzed51/console-options/issues",
+                "source": "https://github.com/fzed51/console-options/tree/v1.1.4"
+            },
+            "time": "2020-11-20T23:28:50+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "doctrine/instantiator",
