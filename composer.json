@@ -5,7 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Version\\": "src/"
+            "Version\\": "src/Version/"
         }
     },
     "autoload-dev": {
@@ -23,7 +23,8 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=7.4.0",
-      "ext-json": "*"
+      "ext-json": "*",
+        "fzed51/console-options": "^1.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
@@ -38,5 +39,8 @@
             "phpstan analyse"
         ],
         "test": "phpunit"
-    }
+    },
+    "bin": [
+        "./src/bin/version-manager"
+    ]
 }

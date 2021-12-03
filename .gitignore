@@ -16,3 +16,4 @@
 # PROJET
 #
 /.phpunit.cache/
+*.log
