@@ -53,7 +53,7 @@ class SemVerTest extends TestCase
     public function testInitWithFileExist(): void
     {
         $this->expectException(CliMessageException::class);
-        $this->expectErrorMessage("./version.json existe déjà, pour forcer l'initialisation, utiliser le flag --force");
+        $this->expectErrorMessage("./version.json existe déjà, pour forcer l'initialisation, utiliser le flag -force");
         $cwd = getcwd();
         chdir(__DIR__."/../../fileVersion/forInit");
         $cli = new SemVer();
