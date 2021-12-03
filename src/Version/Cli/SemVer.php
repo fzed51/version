@@ -1,9 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace Version\Cli;
 
 use Exception;
 
+/**
+ * class maitraisse pour l'outil version manager
+ */
 class SemVer
 {
     /** @var string nom du fichier de version */
@@ -17,8 +21,6 @@ class SemVer
 
         $this->versionFile = $versionFile;
     }
-
-
 
     /**
      * @return string
@@ -114,7 +116,9 @@ class SemVer
     }
 
     /**
+     * modification de le preRelease
      * @param string $preRelease
+     * @param bool $force
      * @return string
      */
     public function preRelease(string $preRelease, bool $force = false): string
@@ -135,6 +139,12 @@ class SemVer
         return $out;
     }
 
+    /**
+     * modification de la version
+     * @param string $strVersion
+     * @param bool $force
+     * @return string
+     */
     public function set(string $strVersion, bool $force = false): string
     {
         $this->testFileVersion();
@@ -152,6 +162,10 @@ class SemVer
         return $out;
     }
 
+    /**
+     * usage
+     * @return string
+     */
     public function usage(): string
     {
         return <<<USAGE

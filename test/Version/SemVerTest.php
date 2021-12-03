@@ -99,7 +99,6 @@ class SemVerTest extends TestCase
         self::assertTrue($version3->gt($version4), "$version2 > $version4");
         self::assertTrue($version3->gt($version5), "$version2 > $version5");
         self::assertTrue($version4->lt($version5), "$version4 < $version5");
-
     }
 
     public function testJson(): void
