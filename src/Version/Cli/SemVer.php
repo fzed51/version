@@ -38,7 +38,7 @@ class SemVer
     {
         if (is_file($this->versionFile) && !$force) {
             throw new CliMessageException(
-                "$this->versionFile existe déjà, pour forcer l'initialisation, utiliser le flag --force"
+                "$this->versionFile existe déjà, pour forcer l'initialisation, utiliser le flag -force"
             );
         }
         $version = new \Version\SemVer(0, 0, 1);
@@ -68,7 +68,7 @@ class SemVer
                 break;
             default:
                 throw new CliMessageException(
-                    "la version $level ne peut être incrementé, utiliser le therme major|minor|`patch"
+                    "la version $level ne peut être incrementé, utiliser le therme major|minor|patch"
                 );
         }
         $out.= "nouvelle version : " . (string) $version;
@@ -83,7 +83,7 @@ class SemVer
     {
         if (!is_file($this->versionFile)) {
             throw new CliMessageException(
-                "$this->versionFile n'est pas un fichier valide, veuillez utiliser le flag --init"
+                "$this->versionFile n'est pas un fichier valide, veuillez utiliser le flag -init"
             );
         }
     }
@@ -127,7 +127,7 @@ class SemVer
         if (!$force && $version->lt($oldVersion)) {
             throw new CliMessageException(
                 "Vous allez assigner une version inférieure à la version actuelle. Pour effectuer quand même "
-                ."cette opération, utiliser le flag --force"
+                ."cette opération, utiliser le flag -force"
             );
         }
         $out.= "nouvelle version : " . (string) $version;
@@ -144,7 +144,7 @@ class SemVer
         if (!$force && $version->lt($oldVersion)) {
             throw new CliMessageException(
                 "Vous allez assigner une version inférieure à la version actuelle. Pour effectuer quand même "
-                ."cette opération, utiliser le flag --force"
+                ."cette opération, utiliser le flag -force"
             );
         }
         $out.= "nouvelle version : " . (string) $version;
@@ -160,24 +160,24 @@ Usage:
 
 version-manager [--path chemin/version.json] [commande] [option]
 
-* --path -p [chemin] : indique la location du fichier de version
+* -path -p [chemin] : indique la location du fichier de version
                        ./version.json est pris comme valeur si le path n'est pas utilisé
     
 Commandes :
 ------------
 
 * sans commande        : lit le fichier de version
-* --init -i            : initialise le fichier de version (v0.0.1)
-* --increment -u [val] : incrément un element de la version 
+* -init -i            : initialise le fichier de version (v0.0.1)
+* -increment -u [val] : incrément un element de la version 
                          val = major | minor | patch
-* --preRelease -p [pr] : modifie l'élément preRelease de la version
-* --set -s [ver]       : modifie le numero de version 
+* -preRelease -r [pr] : modifie l'élément preRelease de la version
+* -set -s [ver]       : modifie le numero de version 
 
 Options :
 ----------
 
-* --force -f : force la commande (init, preRelease et set)
-* --help -h  : affiche ce message
+* -force -f : force la commande (init, preRelease et set)
+* -help -h  : affiche ce message
 USAGE;
     }
 }
