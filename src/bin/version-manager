@@ -1,0 +1,4 @@
+#!/usr/bin/env php
+<?php
+$argv = $argv;
+require __DIR__ ."/version-manager.php";
