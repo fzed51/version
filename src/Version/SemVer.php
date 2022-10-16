@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 declare(strict_types=1);
 
 namespace Version;
@@ -67,10 +68,10 @@ class SemVer implements JsonSerializable
     }
 
     /**
-     * @param array<string,mixed>|object $structure
+     * @param object|array<string,mixed> $structure
      * @return \Version\SemVer
      */
-    public static function fromStructure($structure): SemVer
+    public static function fromStructure(array|object $structure): SemVer
     {
         $structure = (array)$structure;
         if ((!isset($structure['major'], $structure['minor'], $structure['patch']))
@@ -108,11 +109,10 @@ class SemVer implements JsonSerializable
     }
 
     /**
-     * sérialisation en json
+     * Sérialisation en json
      * @return array<string,mixed>
-     * @noinspection PhpMissingReturnTypeInspection
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $version = [
             'major' => $this->major,
